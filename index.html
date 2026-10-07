@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday! 💖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Mali', cursive, sans-serif;
+      background: #fce4ec;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* พื้นหลังหัวใจลอย */
+    .bg-heart {
+      position: absolute;
+      color: #ff80ab;
+      opacity: 0.3;
+      animation: floatUp 6s infinite linear;
+      font-size: 20px;
+      z-index: 1;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* ซองจดหมาย */
+    .envelope-wrapper {
+      position: relative;
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.3s;
+    }
+
+    .envelope-wrapper:hover {
+      transform: scale(1.05);
+    }
+
+    .envelope {
+      width: 280px;
+      height: 180px;
+      background: #ff4081;
+      border-radius: 10px;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .envelope::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      border-left: 140px solid transparent;
+      border-right: 140px solid transparent;
+      border-top: 100px solid #ff80ab;
+      transform-origin: top;
+      transition: transform 0.5s ease;
+      z-index: 3;
+    }
+
+    .envelope-wrapper.open .envelope::before {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    .hand-icon {
+      font-size: 40px;
+      z-index: 4;
+      animation: bounce 1.2s infinite alternate;
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+
+    /* การ์ดจดหมาย */
+    .card {
+      position: absolute;
+      bottom: 10px;
+      width: 250px;
+      height: 160px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.8s ease;
+      z-index: 2;
+      opacity: 0;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    /* เมื่อเปิดซองจดหมาย */
+    .envelope-wrapper.open .card {
+      transform: translateY(-120px) scale(1.15);
+      height: 380px;
+      width: 300px;
+      opacity: 1;
+      z-index: 20;
+    }
+
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .card h2 {
+      color: #ff4081;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 16px;
+      color: #aaa;
+      cursor: pointer;
+      display: none;
+    }
+
+    .envelope-wrapper.open .close-btn {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- เพลงพื้นหลัง (ใส่ URL ลิงก์เพลง MP3 ตรง src) -->
+  <audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ซองจดหมาย -->
+  <div class="envelope-wrapper" id="envelopeWrapper" onclick="openEnvelope()">
+    <div class="envelope">
+      <div class="hand-icon">👆</div>
+    </div>
+    
+    <!-- การ์ดข้างใน -->
+    <div class="card" id="card">
+      <span class="close-btn" onclick="closeEnvelope(event)">✕</span>
+      <h2>Happy Birthday! 🎂</h2>
+      <p>
+        ขอบคุณนะที่อยู่ด้วยกันมาตลอด <br>
+        ขอให้มีความสุขมากๆ ในทุกๆ วัน <br>
+        มีรอยยิ้มที่สดใสแบบนี้ตลอดไปนะ ✨💖
+      </p>
+      
+      <!-- รูปภาพในการ์ด -->
+      <img src="Photo.jpg" alt="Birthday Photo">
+    </div>
+  </div>
+
+  <script>
+    // สร้างหัวใจลอยพื้นหลัง
+    for (let i = 0; i < 15; i++) {
+      let heart = document.createElement('div');
+      heart.className = 'bg-heart';
+      heart.innerHTML = '💗';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDelay = Math.random() * 5 + 's';
+      heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+      document.body.appendChild(heart);
+    }
+
+    // ฟังก์ชันเปิดซองจดหมาย
+    function openEnvelope() {
+      const wrapper = document.getElementById('envelopeWrapper');
+      const music = document.getElementById('bgMusic');
+      
+      if (!wrapper.classList.contains('open')) {
+        wrapper.classList.add('open');
+        music.play(); // เล่นเพลงอัตโนมัติเมื่อกดเปิด
+        
+        // จุดพลุหัวใจ
+        confetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    // ฟังก์ชันปิดซองจดหมาย
+    function closeEnvelope(event) {
+      event.stopPropagation(); // ป้องกันไม่ให้ส่งคำสั่งเปิดซ้ำ
+      const wrapper = document.getElementById('envelopeWrapper');
+      const music = document.getElementById('bgMusic');
+      
+      wrapper.classList.remove('open');
+      music.pause(); // หยุดเพลงเมื่อปิด
+    }
+  </script>
+
+</body>
+</html>
